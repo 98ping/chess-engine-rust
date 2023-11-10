@@ -1,5 +1,6 @@
 use piston::input::GenericEvent;
 use ::{Tile};
+use Board;
 
 pub struct MoveHandler {
     pub selected_cell: Option<Tile>,
@@ -7,6 +8,45 @@ pub struct MoveHandler {
 }
 
 impl MoveHandler {
+
+    pub fn get_tile_from_position(&self, position: &str, board: &Board) -> Option<Tile> {
+        let alphabet: String = String::from("abcdefghijklmnopqrstuvwxyz");
+        let mut rank: u32 = 0;
+        let mut file: u32 = 0;
+
+        // Alphabetized character
+        let first_character: char = position.chars().nth(0).unwrap();
+
+        for (i, c) in alphabet.char_indices() {
+            if c == first_character {
+                rank = i as u32
+            }
+        }
+
+        println!("Tile Rank: {}", rank);
+
+        // File index
+        let second_character: char = position.chars().nth(1).unwrap();
+
+        if second_character.is_digit(10) {
+            let parsed_integer = second_character as i32 - 0x30;
+
+            if parsed_integer < 10 {
+                file = parsed_integer as u32;
+            }
+        }
+
+        println!("Tile File: {}", file);
+
+        let optional_tile = board.tiles.get(&(rank + file)).cloned();
+
+        if optional_tile.is_some() {
+            println!("Optional tile was some")
+        }
+
+        return optional_tile
+
+    }
 
     pub fn new() -> MoveHandler {
         MoveHandler {

@@ -8,11 +8,14 @@ extern crate piston;
 
 extern crate rand;
 
+use std::collections::HashMap;
 use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow;
+use graphics::types::Color;
 use opengl_graphics::{GlGraphics, OpenGL};
+use fen::Fen;
 use r#move::MoveHandler;
 
 
@@ -34,19 +37,25 @@ fn main() {
         gl: GlGraphics::new(opengl),
         tiles_per_axis: 8,
         tile_len: TILE_AXIS_PIXELS,
-        tiles: vec![],
+        tiles: HashMap::new(),
     };
 
     let mut move_handler = MoveHandler::new();
+    let fen_manager = Fen {
+        fen_string: "64".parse().unwrap()
+    };
 
     let mut events = Events::new(EventSettings::new())
         .ups(2);
+
 
     while let Some(e) = events.next(&mut window) {
         move_handler.event(
             800.0,
             &e,
-            &board.tiles.to_vec()
+            &board.tiles.clone().into_iter()
+                .map(|(_id, score)| score)
+                .collect()
         );
 
         if let Some(r) = e.render_args() {
@@ -55,6 +64,7 @@ fn main() {
     }
 }
 
+#[derive(Clone)]
 pub struct Piece {
     worth: i32,
     name: String,
@@ -65,17 +75,18 @@ pub struct Board {
     gl: GlGraphics,
     tiles_per_axis: u32,
     tile_len: f64,
-    tiles: Vec<Tile>
+    tiles: HashMap<u32, Tile>
 }
 
 #[derive(Clone)]
 pub struct Tile {
-    color: [f32; 4],
+    color: Color,
     x1: u32,
     y1: u32,
     x2: u32,
     y2: u32,
-    owning_piece: Option<Piece>
+    owning_piece: Option<Piece>,
+    board_index: u32
 }
 
 impl Tile {
@@ -112,29 +123,31 @@ impl Board {
     fn render(&mut self, args: &RenderArgs) {
         use graphics;
 
-        const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
-        const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
+        let white = graphics::color::hex("ccac95");
+        let black = graphics::color::hex("a67a5a");
+
+        // Track board position (0-63)
+        let mut board_pos = 0;
 
         for file in 0..8 {
             for rank in 0..8 {
                 let is_light: bool = (file + rank) % 2 != 0;
 
                 let mut tile = Tile {
-                    color: if is_light { WHITE } else {BLACK},
+                    color: if is_light { white } else { black },
                     x1: rank * 100,
                     y1: file * 100,
                     x2: (rank * 100) + 99,
                     y2: (file * 100) + 99,
-                    owning_piece: None
+                    owning_piece: None,
+                    board_index: board_pos
                 };
 
+                board_pos += 1;
                 tile.render(&mut self.gl, args);
-                self.add_tile(tile);
+
+                self.tiles.insert(tile.board_index, tile);
             }
         }
-    }
-    
-    fn add_tile(&mut self, tile: Tile) {
-        self.tiles.push(tile)
     }
 }

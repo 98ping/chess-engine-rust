@@ -7,7 +7,7 @@ pub struct Fen {
 }
 
 impl Fen {
-    fn interpret(self) -> Vec<Tile> {
+    pub(crate) fn interpret(self) -> Vec<Tile> {
         let mut new_tiles = vec![];
 
         let mut i = 0;
@@ -19,12 +19,13 @@ impl Fen {
                 for slot in 0..spaces {
                     new_tiles.push(
                         Tile {
-                            color: if i % 2 != 0 { WHITE } else {BLACK},
+                            color: if i % 2 != 0 { graphics::color::hex("ccac95") } else { graphics::color::hex("a67a5a") },
                             x1: i * 100,
                             y1: (row - 1) * 100,
                             x2: (i * 100) + 99,
                             y2: ((row - 1) * 100) + 99,
-                            owning_piece: None
+                            owning_piece: None,
+                            board_index: (i * row)
                         }
                     );
 
