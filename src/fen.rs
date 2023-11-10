@@ -33,6 +33,8 @@ impl Fen {
                     // Check if we have to move rows.
                     // For example:
                     //
+                    // If we are at the index (8 * 1) (0-7 are used for boards),
+                    // we add a row and reset index. Should work but idk
                     if i >= 8 * row {
                         row += 1;
                         i = 0;
