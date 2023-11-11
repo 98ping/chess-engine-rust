@@ -13,15 +13,17 @@ impl Fen {
 
         let mut i = 0;
         let mut row = 1;
+        let mut board_pos = 0;
 
         for c in self.fen_string.chars() {
             if c.is_digit(10) {
                 let spaces = c as i32 - 0x30;
 
                 for _slot in 0..spaces {
-                    new_tiles.push(self.create_blank_tile(row, i));
+                    new_tiles.push(self.create_blank_tile(row, i, board_pos));
 
                     i += 1;
+                    board_pos += 1;
                 }
             } else if c == '/' {
                 row += 1;
@@ -30,12 +32,13 @@ impl Fen {
                 let found_piece = piece_hashmap.get(&c);
 
                 if found_piece.is_none() {
-                    new_tiles.push(self.create_blank_tile(row, i));
+                    new_tiles.push(self.create_blank_tile(row, i, board_pos));
                 } else {
-                    new_tiles.push(self.create_pieced_tile(row, i, found_piece.unwrap().clone()))
+                    new_tiles.push(self.create_pieced_tile(row, i, found_piece.unwrap().clone(), board_pos))
                 }
 
                 i += 1;
+                board_pos += 1;
             }
         }
 
@@ -51,7 +54,7 @@ impl Fen {
         return chars_to_piece
     }
 
-    fn create_blank_tile(&self, row: u32, i: u32) -> Tile {
+    fn create_blank_tile(&self, row: u32, i: u32, board_pos: u32) -> Tile {
         return Tile {
             color: if (row + i) % 2 != 0 { graphics::color::hex("ccac95") } else { graphics::color::hex("a67a5a") },
             x1: i * 100,
@@ -59,11 +62,11 @@ impl Fen {
             x2: (i * 100) + 99,
             y2: ((row - 1) * 100) + 99,
             owning_piece: None,
-            board_index: (i * row)
+            board_index: board_pos
         }
     }
 
-    fn create_pieced_tile(&self, row: u32, i: u32, piece: Piece) -> Tile {
+    fn create_pieced_tile(&self, row: u32, i: u32, piece: Piece, board_pos: u32) -> Tile {
         return Tile {
             color: if (row + i) % 2 != 0 { graphics::color::hex("ccac95") } else { graphics::color::hex("a67a5a") },
             x1: i * 100,
@@ -71,7 +74,7 @@ impl Fen {
             x2: (i * 100) + 99,
             y2: ((row - 1) * 100) + 99,
             owning_piece: Some(piece),
-            board_index: (i * row)
+            board_index: board_pos
         }
     }
 

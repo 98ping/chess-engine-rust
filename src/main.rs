@@ -62,11 +62,9 @@ fn main() {
 
         if let Some(r) = e.render_args() {
             if started == 0 {
-                println!("Fen render");
                 board.render_fen(&r, &fen_manager);
                 started = 1;
             } else {
-                println!("Update");
                 board.update(&r)
             }
         }
