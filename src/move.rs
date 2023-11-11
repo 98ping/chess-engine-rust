@@ -51,7 +51,7 @@ impl MoveHandler {
         }
     }
 
-    pub(crate) fn event<E: GenericEvent>(&mut self, size: f64, e: &E, tiles: &Vec<Tile>) {
+    pub(crate) fn event<E: GenericEvent>(&mut self, size: f64, e: &E, tiles: &Vec<Tile>, board: &Board) {
         use piston::input::{Button, MouseButton};
 
         if let Some(pos) = e.mouse_cursor_args() {
@@ -68,6 +68,15 @@ impl MoveHandler {
                 for mut tile in tiles.iter() {
                     if tile.contained_inside(x as u32, y as u32) {
                         self.selected_cell = Option::from(tile.clone());
+
+                        let cloned_cell = self.selected_cell.clone();
+
+                        if cloned_cell.is_some() {
+                            let piece = cloned_cell.clone().unwrap().owning_piece.clone();
+                            let moves = piece.get_move_tiles(board);
+
+                            println!("Got to moves part but didn't really do anything with it")
+                        }
                     }
                 }
             }

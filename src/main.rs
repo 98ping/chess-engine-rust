@@ -19,6 +19,7 @@ use opengl_graphics::{GlGraphics, OpenGL, Texture, TextureSettings};
 use fen::Fen;
 use std::path::Path;
 use opengl_graphics::Texture as GlTexture;
+use piston::input::Key::P;
 use r#move::MoveHandler;
 
 
@@ -60,7 +61,8 @@ fn main() {
             &e,
             &board.tiles.clone().into_iter()
                 .map(|(_id, score)| score)
-                .collect()
+                .collect(),
+            &board
         );
 
         if let Some(r) = e.render_args() {
@@ -75,6 +77,7 @@ fn main() {
 }
 
 #[derive(Clone)]
+#[derive(PartialEq)]
 pub struct Piece {
     worth: i32,
     name: String,
@@ -190,6 +193,16 @@ impl Board {
         }
     }
 
+    fn get_tile_based_on_piece(&self, piece: &Piece) -> Option<&Tile> {
+        for tile in self.tiles.values() {
+            if tile.owning_piece.is_some() && tile.owning_piece.clone().unwrap() == *piece {
+                return Some(tile);
+            }
+        }
+
+        return None;
+    }
+
     fn render_no_fen(&mut self, args: &RenderArgs) {
         use graphics;
 
@@ -219,5 +232,18 @@ impl Board {
                 self.tiles.insert(tile.board_index, tile);
             }
         }
+    }
+}
+
+impl Piece {
+    fn get_move_tiles(&self, board: &Board) -> Vec<Tile> {
+        let moves: Vec<Tile> = vec![];
+        let current_tile = board.get_tile_based_on_piece(&self);
+
+        if current_tile.is_some() {
+            println!("Current tile is some.")
+        }
+
+        return moves;
     }
 }
