@@ -37,17 +37,19 @@ fn main() {
         gl: GlGraphics::new(opengl),
         tiles_per_axis: 8,
         tile_len: TILE_AXIS_PIXELS,
-        tiles: HashMap::new(),
+        tiles: HashMap::new()
     };
 
     let mut move_handler = MoveHandler::new();
+
     let fen_manager = Fen {
-        fen_string: "64".parse().unwrap()
+        fen_string: "RK6/8/8/8/8/8/8/8".to_string()
     };
 
     let mut events = Events::new(EventSettings::new())
         .ups(2);
 
+    let mut started: i32 = 0;
 
     while let Some(e) = events.next(&mut window) {
         move_handler.event(
@@ -59,7 +61,14 @@ fn main() {
         );
 
         if let Some(r) = e.render_args() {
-            board.render(&r);
+            if started == 0 {
+                println!("Fen render");
+                board.render_fen(&r, &fen_manager);
+                started = 1;
+            } else {
+                println!("Update");
+                board.update(&r)
+            }
         }
     }
 }
@@ -68,7 +77,8 @@ fn main() {
 pub struct Piece {
     worth: i32,
     name: String,
-    capturable: bool
+    capturable: bool,
+    white: bool
 }
 
 pub struct Board {
@@ -120,7 +130,25 @@ impl Tile {
 }
 
 impl Board {
-    fn render(&mut self, args: &RenderArgs) {
+
+    fn render_fen(&mut self, args: &RenderArgs, fen: &Fen) {
+        use graphics;
+
+        for mut tile in fen.interpret() {
+            tile.render(&mut self.gl, args);
+            self.tiles.insert(tile.board_index, tile);
+        }
+    }
+
+    fn update(&mut self, args: &RenderArgs) {
+        use graphics;
+
+        for tile in self.tiles.values_mut() {
+            tile.render(&mut self.gl, args);
+        }
+    }
+
+    fn render_no_fen(&mut self, args: &RenderArgs) {
         use graphics;
 
         let white = graphics::color::hex("ccac95");

@@ -23,8 +23,6 @@ impl MoveHandler {
             }
         }
 
-        println!("Tile Rank: {}", rank);
-
         // File index
         let second_character: char = position.chars().nth(1).unwrap();
 
@@ -35,8 +33,6 @@ impl MoveHandler {
                 file = parsed_integer as u32;
             }
         }
-
-        println!("Tile File: {}", file);
 
         let optional_tile = board.tiles.get(&(rank + file)).cloned();
 
@@ -71,7 +67,7 @@ impl MoveHandler {
                 // Compute the tile position.
                 for mut tile in tiles.iter() {
                     if tile.contained_inside(x as u32, y as u32) {
-                        self.selected_cell = Option::from(tile.clone())
+                        self.selected_cell = Option::from(tile.clone());
                     }
                 }
             }
