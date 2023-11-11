@@ -13,9 +13,12 @@ use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow;
+use graphics::{DrawState, Image, Text};
 use graphics::types::Color;
-use opengl_graphics::{GlGraphics, OpenGL};
+use opengl_graphics::{GlGraphics, OpenGL, Texture, TextureSettings};
 use fen::Fen;
+use std::path::Path;
+use opengl_graphics::Texture as GlTexture;
 use r#move::MoveHandler;
 
 
@@ -102,6 +105,7 @@ impl Tile {
         use graphics;
 
         let square = graphics::rectangle::square(self.x1 as f64, self.y1 as f64, 100.0);
+        let resource_map = self.map_textures_to_pieces();
 
         gl.draw(
             args.viewport(),
@@ -114,6 +118,46 @@ impl Tile {
                 );
             }
         );
+
+        if self.owning_piece.is_some() {
+            let piece = self.owning_piece.clone().unwrap();
+
+            // Kind of cancerous lol.
+            // Way it has to be done though
+            let image = resource_map.get(
+                &(if piece.white { "White" } else { "Black" }.to_owned() + &piece.name)
+            );
+
+            if image.is_none() {
+                return;
+            }
+
+            let unwrapped_image = image.unwrap();
+
+            gl.draw(
+                args.viewport(),
+                |c, gl| {
+                    Image::new()
+                        .rect([(self.x1 + 10) as f64, (self.y1 + 10) as f64, 80.0, 80.0])
+                        .draw(unwrapped_image,
+                              &DrawState::default(),
+                              c.transform,
+                              gl);
+                }
+            );
+
+        }
+    }
+
+    fn map_textures_to_pieces(&self) -> HashMap<String, Texture> {
+        let mut map: HashMap<String, Texture> = HashMap::new();
+
+        map.insert(String::from("BlackKing"), Texture::from_path(
+            Path::new("bin/assets/black_king.png"),
+            &TextureSettings::new(),
+        ).unwrap());
+
+        return map;
     }
 
     fn contained_inside(&self, cx: u32, cy: u32) -> bool {
