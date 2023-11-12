@@ -73,7 +73,12 @@ impl MoveHandler {
 
                         if cloned_cell.is_some() {
                             let piece = cloned_cell.clone().unwrap().owning_piece.clone();
-                            let moves = piece.get_move_tiles(board);
+
+                            if piece.is_none() {
+                                return
+                            }
+
+                            let moves = piece.unwrap().get_move_tiles(board);
 
                             println!("Got to moves part but didn't really do anything with it")
                         }

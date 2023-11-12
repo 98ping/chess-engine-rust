@@ -160,6 +160,11 @@ impl Tile {
             &TextureSettings::new(),
         ).unwrap());
 
+        map.insert(String::from("BlackRook"), Texture::from_path(
+            Path::new("bin/assets/black_rook.png"),
+            &TextureSettings::new(),
+        ).unwrap());
+
         return map;
     }
 
@@ -206,6 +211,7 @@ impl Board {
     fn render_no_fen(&mut self, args: &RenderArgs) {
         use graphics;
 
+        // Our custom colors b/c they look pretty
         let white = graphics::color::hex("ccac95");
         let black = graphics::color::hex("a67a5a");
 
