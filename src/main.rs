@@ -47,7 +47,7 @@ fn main() {
     let mut move_handler = MoveHandler::new();
 
     let fen_manager = Fen {
-        fen_string: "RK6/8/8/8/8/8/8/8".to_string()
+        fen_string: "RKB5/8/8/8/8/8/8/8".to_string()
     };
 
     let mut events = Events::new(EventSettings::new())
@@ -164,6 +164,12 @@ impl Tile {
             Path::new("bin/assets/black_rook.png"),
             &TextureSettings::new(),
         ).unwrap());
+
+        map.insert(String::from("BlackBishop"), Texture::from_path(
+            Path::new("bin/assets/black_bishop.png"),
+            &TextureSettings::new(),
+        ).unwrap());
+
 
         return map;
     }

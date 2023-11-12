@@ -48,8 +48,9 @@ impl Fen {
     fn load_hashmap_for_pieces(&self) -> HashMap<char, Piece> {
         let mut chars_to_piece: HashMap<char, Piece> = HashMap::new();
 
-        chars_to_piece.insert('R', self.create_generic_piece("Rook", 5, false, false));
+        chars_to_piece.insert('R', self.create_generic_piece("Rook", 5, false, true));
         chars_to_piece.insert('K', self.create_generic_piece("King", 0, false, false));
+        chars_to_piece.insert('B', self.create_generic_piece("Bishop", 2, false, true));
 
         return chars_to_piece
     }
