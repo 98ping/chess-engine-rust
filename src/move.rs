@@ -9,6 +9,40 @@ pub struct MoveHandler {
 
 impl MoveHandler {
 
+    pub fn get_position_from_transformations(&self, start: &str, x: i32, y: i32, board: &Board) -> String {
+        let self_tile = self.get_tile_from_position(start, board);
+
+        return String::new();
+    }
+
+    pub fn get_position_from_tile(&self, tile: &Tile) -> Option<String> {
+        let alphabet: String = String::from("abcdefghijklmnopqrstuvwxyz");
+        let x = tile.x1;
+        let y = tile.y1;
+
+        if x % 100 != 0 {
+            return None
+        }
+
+        let alphabet_char = alphabet.chars().nth((x / 100) as usize);
+
+        if alphabet_char.is_none() {
+            return None
+        }
+
+        let mut y_rank = y / 100;
+
+        if y_rank == 0 {
+            y_rank = 1;
+        }
+
+        let binding = y_rank.to_string();
+        let rank_string = binding.as_str();
+        let alphabet_string = String::from(alphabet_char.unwrap());
+
+        return Some(alphabet_string + rank_string);
+    }
+
     pub fn get_tile_from_position(&self, position: &str, board: &Board) -> Option<Tile> {
         let alphabet: String = String::from("abcdefghijklmnopqrstuvwxyz");
         let mut rank: u32 = 0;
@@ -19,7 +53,7 @@ impl MoveHandler {
 
         for (i, c) in alphabet.char_indices() {
             if c == first_character {
-                rank = i as u32
+                file = i as u32
             }
         }
 
@@ -30,7 +64,7 @@ impl MoveHandler {
             let parsed_integer = second_character as i32 - 0x30;
 
             if parsed_integer < 10 {
-                file = parsed_integer as u32;
+               rank = (parsed_integer - 1) as u32;
             }
         }
 
@@ -51,7 +85,7 @@ impl MoveHandler {
         }
     }
 
-    pub(crate) fn event<E: GenericEvent>(&mut self, size: f64, e: &E, tiles: &Vec<Tile>, board: &Board) {
+    pub(crate) fn event<E: GenericEvent>(&mut self, size: f64, e: &E, tiles: &Vec<Tile>, board: &mut Board) {
         use piston::input::{Button, MouseButton};
 
         if let Some(pos) = e.mouse_cursor_args() {

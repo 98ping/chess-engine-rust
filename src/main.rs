@@ -60,12 +60,26 @@ fn main() {
             &board.tiles.clone().into_iter()
                 .map(|(_id, score)| score)
                 .collect(),
-            &board
+            &mut board
         );
 
         if let Some(r) = e.render_args() {
             if started == 0 {
                 board.render_fen(&r, &fen_manager);
+                let tile = move_handler.get_tile_from_position("a1", &board);
+                if tile.is_some() {
+                    println!("Tile was some: {}", tile.clone().unwrap().board_index)
+                }
+
+                let string_pos = move_handler.get_position_from_tile(&tile.clone().unwrap());
+
+                if string_pos.is_none() {
+                    println!("String position is none");
+                }
+
+                println!("String pos: {}", string_pos.unwrap());
+
+
                 started = 1;
             } else {
                 board.update(&r)
@@ -254,10 +268,18 @@ impl Board {
 impl Piece {
     fn get_move_tiles(&self, board: &Board) -> Vec<Tile> {
         let moves: Vec<Tile> = vec![];
-        let current_tile = board.get_tile_based_on_piece(&self);
+        let current_tile = board.get_tile_based_on_piece(&self).cloned();
 
         if current_tile.is_some() {
-            println!("Current tile is some.")
+            let piece = current_tile.unwrap().owning_piece;
+
+            if piece.is_some() {
+                let name = piece.unwrap().name;
+
+                if name == "Pawn" {
+
+                }
+            }
         }
 
         return moves;
