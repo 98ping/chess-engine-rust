@@ -7,12 +7,50 @@ pub struct MoveHandler {
     pub cursor_pos: [f64; 2],
 }
 
+// For future refrence:
+// Any 'x' related aspects of the movement
+// system are related to the characters on a chessboard
+// (a-h)
+//
+// Any 'y' related aspects of the movement
+// system are related to the digits on a chessboard
+// (1-8)
 impl MoveHandler {
 
-    pub fn get_position_from_transformations(&self, start: &str, x: i32, y: i32, board: &Board) -> String {
-        let self_tile = self.get_tile_from_position(start, board);
+    pub fn get_position_from_transformations(&self, start: &str, next_file: u32, next_rank: u32) -> Option<String> {
+        let alphabet: String = String::from("abcdefghijklmnopqrstuvwxyz");
 
-        return String::new();
+        let mut rank: u32 = 0;
+        let mut file: u32 = 0;
+
+        // Alphabetized character
+        let first_character: char = start.chars().nth(0).unwrap();
+
+        for (i, c) in alphabet.char_indices() {
+            if c == first_character {
+                file = i as u32
+            }
+        }
+
+        // File index
+        let second_character: char = start.chars().nth(1).unwrap();
+
+        if second_character.is_digit(10) {
+            let parsed_integer = second_character as i32 - 0x30;
+
+            if parsed_integer < 10 {
+                rank = (parsed_integer - 1) as u32;
+            }
+        }
+
+        let new_file = (file + (next_file + 1)).to_string();
+        let new_rank = alphabet.chars().nth((rank + next_rank) as usize);
+
+        if new_rank.is_none() {
+            return None;
+        }
+
+        return Some(String::from(new_rank.unwrap()) + new_file.as_str());
     }
 
     pub fn get_position_from_tile(&self, tile: &Tile) -> Option<String> {

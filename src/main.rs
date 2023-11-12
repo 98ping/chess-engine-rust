@@ -77,6 +77,16 @@ fn main() {
                     println!("String position is none");
                 }
 
+                let transformed = move_handler.get_position_from_transformations("a1", 1, 1);
+
+                if transformed.is_none() {
+                    println!("Was none");
+                } else {
+                    let unwrapped = transformed.unwrap();
+
+                    println!("New pos: {}", unwrapped);
+                }
+
                 println!("String pos: {}", string_pos.unwrap());
 
 
