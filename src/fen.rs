@@ -51,6 +51,7 @@ impl Fen {
         chars_to_piece.insert('R', self.create_generic_piece("Rook", 5, false, true));
         chars_to_piece.insert('K', self.create_generic_piece("King", 0, false, false));
         chars_to_piece.insert('B', self.create_generic_piece("Bishop", 2, false, true));
+        chars_to_piece.insert('P', self.create_generic_piece("Pawn", 1, false, true));
 
         return chars_to_piece
     }

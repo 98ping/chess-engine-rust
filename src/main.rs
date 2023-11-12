@@ -18,8 +18,6 @@ use graphics::types::Color;
 use opengl_graphics::{GlGraphics, OpenGL, Texture, TextureSettings};
 use fen::Fen;
 use std::path::Path;
-use opengl_graphics::Texture as GlTexture;
-use piston::input::Key::P;
 use r#move::MoveHandler;
 
 
@@ -47,7 +45,7 @@ fn main() {
     let mut move_handler = MoveHandler::new();
 
     let fen_manager = Fen {
-        fen_string: "RKB5/8/8/8/8/8/8/8".to_string()
+        fen_string: "RKB5/PPPPPPPP/8/8/8/8/8/8".to_string()
     };
 
     let mut events = Events::new(EventSettings::new())
@@ -169,6 +167,12 @@ impl Tile {
             Path::new("bin/assets/black_bishop.png"),
             &TextureSettings::new(),
         ).unwrap());
+
+        map.insert(String::from("BlackPawn"), Texture::from_path(
+            Path::new("bin/assets/black_pawn.png"),
+            &TextureSettings::new(),
+        ).unwrap());
+
 
 
         return map;

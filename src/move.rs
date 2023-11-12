@@ -71,9 +71,11 @@ impl MoveHandler {
 
                         let cloned_cell = self.selected_cell.clone();
 
+                        // Ensure optional for cell is validated
                         if cloned_cell.is_some() {
                             let piece = cloned_cell.clone().unwrap().owning_piece.clone();
 
+                            // Valid piece in cell
                             if piece.is_none() {
                                 return
                             }
