@@ -53,6 +53,20 @@ impl MoveHandler {
         return Some(String::from(new_rank.unwrap()) + new_file.as_str());
     }
 
+    pub fn move_piece_from_tile(&self, board: &mut Board, tile: &mut Tile, dist_x: u32, dist_y: u32) {
+        board.tiles.insert(tile.board_index, Tile {
+            color: tile.color,
+            x1: tile.x1,
+            y1: tile.y1,
+            x2: tile.x2,
+            y2: tile.y2,
+            owning_piece: None,
+            board_index: tile.board_index
+        });
+
+        return ();
+    }
+
     pub fn get_position_from_tile(&self, tile: &Tile) -> Option<String> {
         let alphabet: String = String::from("abcdefghijklmnopqrstuvwxyz");
         let x = tile.x1;
@@ -137,7 +151,7 @@ impl MoveHandler {
             // Check that coordinates are inside board boundaries.
             if x >= 0.0 && x <= size && y >= 0.0 && y <= size {
                 // Compute the tile position.
-                for mut tile in tiles.iter() {
+                for tile in tiles.iter() {
                     if tile.contained_inside(x as u32, y as u32) {
                         self.selected_cell = Option::from(tile.clone());
 

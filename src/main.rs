@@ -13,7 +13,7 @@ use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow;
-use graphics::{DrawState, Image, Text};
+use graphics::{DrawState, Image};
 use graphics::types::Color;
 use opengl_graphics::{GlGraphics, OpenGL, Texture, TextureSettings};
 use fen::Fen;
@@ -89,6 +89,11 @@ fn main() {
 
                 println!("String pos: {}", string_pos.unwrap());
 
+                let mut first_tile = board.tiles.get(&1).unwrap().clone();
+
+                println!("Board index: {}", first_tile.board_index);
+
+                move_handler.move_piece_from_tile(&mut board, &mut first_tile, 0, 0);
 
                 started = 1;
             } else {
