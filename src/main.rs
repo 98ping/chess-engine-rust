@@ -13,8 +13,8 @@ use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow;
-use graphics::{DrawState, Image};
-use graphics::types::Color;
+use graphics::{DrawState, Ellipse, Image};
+use graphics::types::{Color, Rectangle};
 use opengl_graphics::{GlGraphics, OpenGL, Texture, TextureSettings};
 use fen::Fen;
 use std::path::Path;
@@ -90,8 +90,6 @@ fn main() {
                 println!("String pos: {}", string_pos.unwrap());
 
                 let mut first_tile = board.tiles.get(&1).unwrap().clone();
-
-                println!("Board index: {}", first_tile.board_index);
 
                 move_handler.move_piece_from_tile(&mut board, &mut first_tile, 0, 0);
 
@@ -177,6 +175,23 @@ impl Tile {
             );
 
         }
+    }
+
+    fn render_move_circle(&self, gl: &mut GlGraphics, args: &RenderArgs) {
+        let x: u32 = self.x1;
+        let y: u32 = self.y1;
+
+        gl.draw(
+            args.viewport(),
+            |c, gl| {
+                Ellipse::new([0.0, 0.0, 0.0, 1.0])
+                    .draw(
+                        [(x + 35) as f64, (y + 35) as f64, 30.0, 30.0],
+                        &DrawState::default(),
+                        c.transform,
+                        gl);
+            }
+        );
     }
 
     fn map_textures_to_pieces(&self) -> HashMap<String, Texture> {
