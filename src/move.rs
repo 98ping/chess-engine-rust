@@ -1,4 +1,5 @@
-use piston::input::GenericEvent;
+use opengl_graphics::GlGraphics;
+use piston::input::{GenericEvent, RenderArgs};
 use ::{Tile};
 use Board;
 
@@ -16,7 +17,6 @@ pub struct MoveHandler {
 // system are related to the digits on a chessboard
 // (1-8)
 impl MoveHandler {
-
     pub fn get_position_from_transformations(&self, start: &str, next_file: u32, next_rank: u32) -> Option<String> {
         let alphabet: String = String::from("abcdefghijklmnopqrstuvwxyz");
 
@@ -61,7 +61,7 @@ impl MoveHandler {
             x2: tile.x2,
             y2: tile.y2,
             owning_piece: None,
-            board_index: tile.board_index
+            board_index: tile.board_index,
         });
 
         return ();
@@ -73,13 +73,13 @@ impl MoveHandler {
         let y = tile.y1;
 
         if x % 100 != 0 {
-            return None
+            return None;
         }
 
         let alphabet_char = alphabet.chars().nth((x / 100) as usize);
 
         if alphabet_char.is_none() {
-            return None
+            return None;
         }
 
         let mut y_rank = y / 100;
@@ -116,7 +116,7 @@ impl MoveHandler {
             let parsed_integer = second_character as i32 - 0x30;
 
             if parsed_integer < 10 {
-               rank = (parsed_integer - 1) as u32;
+                rank = (parsed_integer - 1) as u32;
             }
         }
 
@@ -126,8 +126,7 @@ impl MoveHandler {
             println!("Optional tile was some")
         }
 
-        return optional_tile
-
+        return optional_tile;
     }
 
     pub fn new() -> MoveHandler {
@@ -137,7 +136,12 @@ impl MoveHandler {
         }
     }
 
-    pub(crate) fn event<E: GenericEvent>(&mut self, size: f64, e: &E, tiles: &Vec<Tile>, board: &mut Board) {
+    pub(crate) fn event<E: GenericEvent>(
+        &mut self,
+        size: f64,
+        e: &E,
+        board: &mut Board,
+    ) {
         use piston::input::{Button, MouseButton};
 
         if let Some(pos) = e.mouse_cursor_args() {
@@ -151,7 +155,7 @@ impl MoveHandler {
             // Check that coordinates are inside board boundaries.
             if x >= 0.0 && x <= size && y >= 0.0 && y <= size {
                 // Compute the tile position.
-                for tile in tiles.iter() {
+                for tile in board.tiles.values().into_iter() {
                     if tile.contained_inside(x as u32, y as u32) {
                         self.selected_cell = Option::from(tile.clone());
 
@@ -163,10 +167,25 @@ impl MoveHandler {
 
                             // Valid piece in cell
                             if piece.is_none() {
-                                return
+                                return;
                             }
 
                             let moves = piece.unwrap().get_move_tiles(board);
+                            
+                            for tile_move in moves.iter() {
+                                println!("Move iter");
+                                println!("Tile move index: {}", tile_move.board_index);
+
+                                tile_move.render_move_circle(&mut board.gl, &RenderArgs {
+                                    ext_dt: 0.0,
+                                    width: 800,
+                                    height: 800,
+                                    draw_width: 800,
+                                    draw_height: 800,
+                                });
+
+                                print!("Moves done");
+                            }
 
                             println!("Got to moves part but didn't really do anything with it")
                         }

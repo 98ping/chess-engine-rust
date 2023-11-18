@@ -52,7 +52,9 @@ impl Fen {
         chars_to_piece.insert('K', self.create_generic_piece("King", 0, false, false));
         chars_to_piece.insert('B', self.create_generic_piece("Bishop", 2, false, true));
         chars_to_piece.insert('P', self.create_generic_piece("Pawn", 1, false, true));
-
+        chars_to_piece.insert('N', self.create_generic_piece("Knight", 1, false, true));
+        chars_to_piece.insert('Q', self.create_generic_piece("Queen", 1, false, true));
+        
         return chars_to_piece
     }
 

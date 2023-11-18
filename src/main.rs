@@ -39,13 +39,13 @@ fn main() {
         gl: GlGraphics::new(opengl),
         tiles_per_axis: 8,
         tile_len: TILE_AXIS_PIXELS,
-        tiles: HashMap::new()
+        tiles: HashMap::new(),
     };
 
     let mut move_handler = MoveHandler::new();
 
     let fen_manager = Fen {
-        fen_string: "RKB5/PPPPPPPP/8/8/8/8/8/8".to_string()
+        fen_string: "RNBQKBNR/PPPPPPPP/8/8/8/8/8/8".to_string()
     };
 
     let mut events = Events::new(EventSettings::new())
@@ -57,9 +57,6 @@ fn main() {
         move_handler.event(
             800.0,
             &e,
-            &board.tiles.clone().into_iter()
-                .map(|(_id, score)| score)
-                .collect(),
             &mut board
         );
 
@@ -91,7 +88,7 @@ fn main() {
 
                 let mut first_tile = board.tiles.get(&1).unwrap().clone();
 
-                move_handler.move_piece_from_tile(&mut board, &mut first_tile, 0, 0);
+                //move_handler.move_piece_from_tile(&mut board, &mut first_tile, 0, 0);
 
                 started = 1;
             } else {
@@ -107,14 +104,14 @@ pub struct Piece {
     worth: i32,
     name: String,
     capturable: bool,
-    white: bool
+    white: bool,
 }
 
 pub struct Board {
     gl: GlGraphics,
     tiles_per_axis: u32,
     tile_len: f64,
-    tiles: HashMap<u32, Tile>
+    tiles: HashMap<u32, Tile>,
 }
 
 #[derive(Clone)]
@@ -125,7 +122,7 @@ pub struct Tile {
     x2: u32,
     y2: u32,
     owning_piece: Option<Piece>,
-    board_index: u32
+    board_index: u32,
 }
 
 impl Tile {
@@ -142,9 +139,9 @@ impl Tile {
                     self.color,
                     square,
                     c.transform,
-                    gl
+                    gl,
                 );
-            }
+            },
         );
 
         if self.owning_piece.is_some() {
@@ -171,9 +168,8 @@ impl Tile {
                               &DrawState::default(),
                               c.transform,
                               gl);
-                }
+                },
             );
-
         }
     }
 
@@ -190,7 +186,7 @@ impl Tile {
                         &DrawState::default(),
                         c.transform,
                         gl);
-            }
+            },
         );
     }
 
@@ -217,7 +213,15 @@ impl Tile {
             &TextureSettings::new(),
         ).unwrap());
 
+        map.insert(String::from("BlackKnight"), Texture::from_path(
+            Path::new("bin/assets/black_knight.png"),
+            &TextureSettings::new(),
+        ).unwrap());
 
+        map.insert(String::from("BlackQueen"), Texture::from_path(
+            Path::new("bin/assets/black_queen.png"),
+            &TextureSettings::new(),
+        ).unwrap());
 
         return map;
     }
@@ -229,12 +233,11 @@ impl Tile {
         let x2 = self.x2;
         let y2 = self.y2;
 
-        return (cx > x1 && cx < x2) && (cy > y1 && cy < y2)
+        return (cx > x1 && cx < x2) && (cy > y1 && cy < y2);
     }
 }
 
 impl Board {
-
     fn render_fen(&mut self, args: &RenderArgs, fen: &Fen) {
         use graphics;
 
@@ -262,6 +265,16 @@ impl Board {
         return None;
     }
 
+    fn get_tile_based_on_index(&self, index: u32) -> Option<Tile> {
+        for tile in self.tiles.values() {
+            if tile.board_index == index {
+                return Some(tile.clone());
+            }
+        }
+
+        return None;
+    }
+
     fn render_no_fen(&mut self, args: &RenderArgs) {
         use graphics;
 
@@ -283,7 +296,7 @@ impl Board {
                     x2: (rank * 100) + 99,
                     y2: (file * 100) + 99,
                     owning_piece: None,
-                    board_index: board_pos
+                    board_index: board_pos,
                 };
 
                 board_pos += 1;
@@ -297,17 +310,27 @@ impl Board {
 
 impl Piece {
     fn get_move_tiles(&self, board: &Board) -> Vec<Tile> {
-        let moves: Vec<Tile> = vec![];
+        let mut moves: Vec<Tile> = vec![];
         let current_tile = board.get_tile_based_on_piece(&self).cloned();
 
         if current_tile.is_some() {
-            let piece = current_tile.unwrap().owning_piece;
+            let piece = current_tile.clone().unwrap().owning_piece;
 
             if piece.is_some() {
-                let name = piece.unwrap().name;
+                let unwrapped_piece = piece.unwrap();
+                let unwrapped_tile = current_tile.clone().unwrap();
+                let name = unwrapped_piece.name;
 
-                if name == "Pawn" {
+                if name == "Pawn" && !unwrapped_piece.white {
+                    println!("Original Board Index: {}", unwrapped_tile.board_index);
+                    let first_tile_down_i = unwrapped_tile.board_index + 16;
+                    println!("First Tile Down Line: {}", first_tile_down_i);
+                    let to_render = board.get_tile_based_on_index(first_tile_down_i);
 
+                    if to_render.is_some() {
+                        println!("Adding tile to stack");
+                        moves.push(to_render.unwrap());
+                    }
                 }
             }
         }
