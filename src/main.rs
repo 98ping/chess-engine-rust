@@ -115,6 +115,7 @@ pub struct Board {
 }
 
 #[derive(Clone)]
+#[derive(PartialEq)]
 pub struct Tile {
     color: Color,
     x1: u32,

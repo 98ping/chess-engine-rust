@@ -153,51 +153,95 @@ impl MoveHandler {
             let x = self.cursor_pos[0];
             let y = self.cursor_pos[1];
 
-            println!("X: {}", x);
-            println!("Y: {}", y);
+            if self.selected_cell == None {
+                // Check that coordinates are inside board boundaries.
+                if x >= 0.0 && x <= size && y >= 0.0 && y <= size {
+                    // Compute the tile position.
+                    for tile in board.tiles.values().into_iter() {
+                        if tile.contained_inside(x as u32, y as u32) {
+                            self.selected_cell = Option::from(tile.clone());
 
-            // Reset selected cell
-            self.selected_cell = None;
+                            let cloned_cell = self.selected_cell.clone();
 
-            // Check that coordinates are inside board boundaries.
-            if x >= 0.0 && x <= size && y >= 0.0 && y <= size {
-                // Compute the tile position.
-                for tile in board.tiles.values().into_iter() {
-                    if tile.contained_inside(x as u32, y as u32) {
-                        self.selected_cell = Option::from(tile.clone());
+                            // Ensure optional for cell is validated
+                            if cloned_cell.is_some() {
+                                let piece = cloned_cell.clone().unwrap().owning_piece.clone();
 
-                        let cloned_cell = self.selected_cell.clone();
+                                // Valid piece in cell
+                                if piece.is_none() {
+                                    return;
+                                }
 
-                        // Ensure optional for cell is validated
-                        if cloned_cell.is_some() {
-                            let piece = cloned_cell.clone().unwrap().owning_piece.clone();
+                                let moves = piece.unwrap().get_move_tiles(board, cloned_cell.unwrap().board_index);
 
-                            // Valid piece in cell
-                            if piece.is_none() {
-                                return;
+                                for tile_move in moves.iter() {
+                                    println!("Move iter");
+                                    println!("Tile move index: {}", tile_move.board_index);
+
+                                    tile_move.render_move_circle(&mut board.gl, &RenderArgs {
+                                        ext_dt: 0.0001488,
+                                        width: 800,
+                                        height: 800,
+                                        draw_width: 800,
+                                        draw_height: 800,
+                                    });
+
+                                    print!("Moves done");
+                                }
+
+                                println!("Set selected cell to a certain point")
                             }
-
-                            let moves = piece.unwrap().get_move_tiles(board, cloned_cell.unwrap().board_index);
-
-                            for tile_move in moves.iter() {
-                                println!("Move iter");
-                                println!("Tile move index: {}", tile_move.board_index);
-
-                                tile_move.render_move_circle(&mut board.gl, &RenderArgs {
-                                    ext_dt: 0.0,
-                                    width: 800,
-                                    height: 800,
-                                    draw_width: 800,
-                                    draw_height: 800,
-                                });
-
-                                print!("Moves done");
-                            }
-
-                            println!("Got to moves part but didn't really do anything with it")
                         }
                     }
                 }
+            } else {
+                // Ensure boundaries are still valid
+                if x >= 0.0 && x <= size && y >= 0.0 && y <= size {
+                    // Compute the tile position.
+                    for tile in board.tiles.clone().values().into_iter() {
+                        if tile.contained_inside(x as u32, y as u32) {
+                            let prev_tile = self.selected_cell.clone();
+
+                            if prev_tile.is_none() {
+                                self.selected_cell = None;
+                                return
+                            }
+
+                            let unwrapped_prev_tile = prev_tile.clone().unwrap();
+                            let prev_piece = unwrapped_prev_tile.owning_piece;
+
+                            if prev_piece.is_none() {
+                                self.selected_cell = None;
+                                return
+                            }
+
+                            let to_move = prev_piece.unwrap();
+
+                            board.tiles.insert(unwrapped_prev_tile.board_index, Tile {
+                                color: unwrapped_prev_tile.color,
+                                x1: unwrapped_prev_tile.x1,
+                                y1: unwrapped_prev_tile.y1,
+                                x2: unwrapped_prev_tile.x2,
+                                y2: unwrapped_prev_tile.y2,
+                                owning_piece: None,
+                                board_index: unwrapped_prev_tile.board_index,
+                            });
+
+                            board.tiles.insert(tile.board_index, Tile {
+                                color: tile.color,
+                                x1: tile.x1,
+                                y1: tile.y1,
+                                x2: tile.x2,
+                                y2: tile.y2,
+                                owning_piece: Some(to_move),
+                                board_index: tile.board_index,
+                            });
+
+                            println!("Performed a move from tile {} to tile {}", unwrapped_prev_tile.board_index, tile.board_index);
+                        }
+                    }
+                }
+                self.selected_cell = None
             }
         }
     }
