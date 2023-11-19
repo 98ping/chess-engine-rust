@@ -104,7 +104,7 @@ pub struct Piece {
     worth: i32,
     name: String,
     capturable: bool,
-    white: bool,
+    white: bool
 }
 
 pub struct Board {
@@ -309,9 +309,9 @@ impl Board {
 }
 
 impl Piece {
-    fn get_move_tiles(&self, board: &Board) -> Vec<Tile> {
+    fn get_move_tiles(&self, board: &Board, current_tile_index: u32) -> Vec<Tile> {
         let mut moves: Vec<Tile> = vec![];
-        let current_tile = board.get_tile_based_on_piece(&self).cloned();
+        let current_tile = board.get_tile_based_on_index(current_tile_index);
 
         if current_tile.is_some() {
             let piece = current_tile.clone().unwrap().owning_piece;

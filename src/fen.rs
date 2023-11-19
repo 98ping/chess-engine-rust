@@ -87,7 +87,7 @@ impl Fen {
             worth: piece_worth,
             name: name_str.to_string(),
             capturable: can_be_captured,
-            white: is_white,
+            white: is_white
         }
     }
 }

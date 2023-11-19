@@ -152,6 +152,13 @@ impl MoveHandler {
             // Find coordinates relative to upper left corner.
             let x = self.cursor_pos[0];
             let y = self.cursor_pos[1];
+
+            println!("X: {}", x);
+            println!("Y: {}", y);
+
+            // Reset selected cell
+            self.selected_cell = None;
+
             // Check that coordinates are inside board boundaries.
             if x >= 0.0 && x <= size && y >= 0.0 && y <= size {
                 // Compute the tile position.
@@ -170,8 +177,8 @@ impl MoveHandler {
                                 return;
                             }
 
-                            let moves = piece.unwrap().get_move_tiles(board);
-                            
+                            let moves = piece.unwrap().get_move_tiles(board, cloned_cell.unwrap().board_index);
+
                             for tile_move in moves.iter() {
                                 println!("Move iter");
                                 println!("Tile move index: {}", tile_move.board_index);
