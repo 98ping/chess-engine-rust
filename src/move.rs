@@ -185,8 +185,6 @@ impl MoveHandler {
                                         draw_width: 800,
                                         draw_height: 800,
                                     });
-
-                                    print!("Moves done");
                                 }
 
                                 println!("Set selected cell to a certain point")
