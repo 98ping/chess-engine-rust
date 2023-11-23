@@ -323,14 +323,18 @@ impl Piece {
                 let name = unwrapped_piece.name;
 
                 if name == "Pawn" && !unwrapped_piece.white {
-                    println!("Original Board Index: {}", unwrapped_tile.board_index);
                     let first_tile_down_i = unwrapped_tile.board_index + 16;
-                    println!("First Tile Down Line: {}", first_tile_down_i);
                     let to_render = board.get_tile_based_on_index(first_tile_down_i);
 
                     if to_render.is_some() {
-                        println!("Adding tile to stack");
                         moves.push(to_render.unwrap());
+                    }
+
+                    let second_tile_down_i = unwrapped_tile.board_index + 8;
+                    let second_tile = board.get_tile_based_on_index(second_tile_down_i);
+
+                    if second_tile.is_some() {
+                        moves.push(second_tile.unwrap());
                     }
                 }
             }

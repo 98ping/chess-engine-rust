@@ -175,9 +175,6 @@ impl MoveHandler {
                                 let moves = piece.unwrap().get_move_tiles(board, cloned_cell.unwrap().board_index);
 
                                 for tile_move in moves.iter() {
-                                    println!("Move iter");
-                                    println!("Tile move index: {}", tile_move.board_index);
-
                                     tile_move.render_move_circle(&mut board.gl, &RenderArgs {
                                         ext_dt: 0.0001488,
                                         width: 800,
@@ -186,8 +183,6 @@ impl MoveHandler {
                                         draw_height: 800,
                                     });
                                 }
-
-                                println!("Set selected cell to a certain point")
                             }
                         }
                     }
@@ -213,7 +208,20 @@ impl MoveHandler {
                                 return
                             }
 
+                            let this_piece = tile.clone().owning_piece;
                             let to_move = prev_piece.unwrap();
+
+                            if this_piece.is_some() && (this_piece.unwrap().white == to_move.white) {
+                                println!("This square is already occupied by a piece!");
+                                self.selected_cell = None;
+                                return;
+                            }
+
+                            if !to_move.get_move_tiles(&board, unwrapped_prev_tile.board_index).contains(tile) {
+                                println!("Could not move here because moves did not contain this tile");
+                                self.selected_cell = None;
+                                return
+                            }
 
                             board.tiles.insert(unwrapped_prev_tile.board_index, Tile {
                                 color: unwrapped_prev_tile.color,
