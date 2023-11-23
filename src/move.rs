@@ -5,7 +5,7 @@ use Board;
 
 pub struct MoveHandler {
     pub selected_cell: Option<Tile>,
-    pub cursor_pos: [f64; 2],
+    pub cursor_pos: [f64; 2]
 }
 
 // For future refrence:
@@ -132,7 +132,7 @@ impl MoveHandler {
     pub fn new() -> MoveHandler {
         MoveHandler {
             selected_cell: None,
-            cursor_pos: [0.0; 2],
+            cursor_pos: [0.0; 2]
         }
     }
 
@@ -141,6 +141,7 @@ impl MoveHandler {
         size: f64,
         e: &E,
         board: &mut Board,
+        render_args: &RenderArgs
     ) {
         use piston::input::{Button, MouseButton};
 
@@ -175,13 +176,7 @@ impl MoveHandler {
                                 let moves = piece.unwrap().get_move_tiles(board, cloned_cell.unwrap().board_index);
 
                                 for tile_move in moves.iter() {
-                                    tile_move.render_move_circle(&mut board.gl, &RenderArgs {
-                                        ext_dt: 0.0001488,
-                                        width: 800,
-                                        height: 800,
-                                        draw_width: 800,
-                                        draw_height: 800,
-                                    });
+                                    tile_move.render_move_circle(&mut board.gl, render_args);
                                 }
                             }
                         }
@@ -247,7 +242,7 @@ impl MoveHandler {
                         }
                     }
                 }
-                self.selected_cell = None
+                self.selected_cell = None;
             }
         }
     }

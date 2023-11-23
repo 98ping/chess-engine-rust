@@ -64,7 +64,14 @@ fn main() {
         move_handler.event(
             800.0,
             &e,
-            &mut board
+            &mut board,
+            e.render_args().get_or_insert(RenderArgs {
+                ext_dt: 0.1,
+                width: 800,
+                height: 800,
+                draw_width: 800,
+                draw_height: 800,
+            })
         );
 
         if let Some(r) = e.render_args() {
@@ -94,10 +101,6 @@ fn main() {
                 }
 
                 println!("String pos: {}", string_pos.unwrap());
-
-                let mut first_tile = board.tiles.get(&1).unwrap().clone();
-
-                //move_handler.move_piece_from_tile(&mut board, &mut first_tile, 0, 0);
 
                 started = 1;
             } else {
@@ -187,6 +190,7 @@ impl Tile {
         let x: u32 = self.x1;
         let y: u32 = self.y1;
 
+        println!("Rendering move circle");
         gl.draw(
             args.viewport(),
             |c, gl| {
@@ -195,9 +199,11 @@ impl Tile {
                         [(x + 35) as f64, (y + 35) as f64, 30.0, 30.0],
                         &DrawState::default(),
                         c.transform,
-                        gl);
+                        gl
+                    );
             },
         );
+        println!("Rendering at: {}, {}", x, y);
     }
 
     fn map_textures_to_pieces(&self) -> HashMap<String, Texture> {
