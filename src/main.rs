@@ -1,5 +1,6 @@
 mod r#move;
 mod fen;
+mod timer;
 
 extern crate glutin_window;
 extern crate graphics;
@@ -13,22 +14,22 @@ use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow;
-use graphics::{DrawState, Ellipse, Image};
+use graphics::{DrawState, Ellipse, Image, Text, text, Transformed};
 use graphics::types::{Color, Rectangle};
-use opengl_graphics::{GlGraphics, OpenGL, Texture, TextureSettings};
+use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, Texture, TextureSettings};
 use fen::Fen;
 use std::path::Path;
 use r#move::MoveHandler;
+use timer::Timer;
 
 
 const TILE_AXIS_PIXELS: f64 = 100.0;
-const AXIS_LEN: u32 = 800;
 
 fn main() {
     // Change this to OpenGL::V2_1 if this fails.
     let opengl = OpenGL::V3_2;
 
-    let mut window: GlutinWindow = WindowSettings::new("Chess Engine Board", [AXIS_LEN, AXIS_LEN])
+    let mut window: GlutinWindow = WindowSettings::new("Chess Engine Board", [1000, 800])
         .opengl(opengl)
         .resizable(false)
         .exit_on_esc(true)
@@ -52,8 +53,14 @@ fn main() {
         .ups(2);
 
     let mut started: i32 = 0;
+    let mut glyphs = GlyphCache::new("bin/views/FiraSans-Regular.ttf", (), TextureSettings::new())
+        .expect("Could not load font");
+
+    let timer_handler = Timer { };
 
     while let Some(e) = events.next(&mut window) {
+        use graphics::*;
+
         move_handler.event(
             800.0,
             &e,
@@ -61,6 +68,8 @@ fn main() {
         );
 
         if let Some(r) = e.render_args() {
+            timer_handler.draw_timers(&mut board.gl, &r, &mut glyphs);
+
             if started == 0 {
                 board.render_fen(&r, &fen_manager);
                 let tile = move_handler.get_tile_from_position("a1", &board);
