@@ -46,7 +46,7 @@ fn main() {
     let mut move_handler = MoveHandler::new();
 
     let fen_manager = Fen {
-        fen_string: "RNBQKBNR/PPPPPPPP/8/8/8/8/8/8".to_string()
+        fen_string: "RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr".to_string()
     };
 
     let mut events = Events::new(EventSettings::new())
@@ -209,33 +209,65 @@ impl Tile {
     fn map_textures_to_pieces(&self) -> HashMap<String, Texture> {
         let mut map: HashMap<String, Texture> = HashMap::new();
 
+        // Black pieces
         map.insert(String::from("BlackKing"), Texture::from_path(
-            Path::new("bin/assets/black_king.png"),
+            Path::new("bin/assets/black/black_king.png"),
             &TextureSettings::new(),
         ).unwrap());
 
         map.insert(String::from("BlackRook"), Texture::from_path(
-            Path::new("bin/assets/black_rook.png"),
+            Path::new("bin/assets/black/black_rook.png"),
             &TextureSettings::new(),
         ).unwrap());
 
         map.insert(String::from("BlackBishop"), Texture::from_path(
-            Path::new("bin/assets/black_bishop.png"),
+            Path::new("bin/assets/black/black_bishop.png"),
             &TextureSettings::new(),
         ).unwrap());
 
         map.insert(String::from("BlackPawn"), Texture::from_path(
-            Path::new("bin/assets/black_pawn.png"),
+            Path::new("bin/assets/black/black_pawn.png"),
             &TextureSettings::new(),
         ).unwrap());
 
         map.insert(String::from("BlackKnight"), Texture::from_path(
-            Path::new("bin/assets/black_knight.png"),
+            Path::new("bin/assets/black/black_knight.png"),
             &TextureSettings::new(),
         ).unwrap());
 
         map.insert(String::from("BlackQueen"), Texture::from_path(
-            Path::new("bin/assets/black_queen.png"),
+            Path::new("bin/assets/black/black_queen.png"),
+            &TextureSettings::new(),
+        ).unwrap());
+
+        // White pieces
+        map.insert(String::from("WhiteKing"), Texture::from_path(
+            Path::new("bin/assets/white/white_king.png"),
+            &TextureSettings::new(),
+        ).unwrap());
+
+        map.insert(String::from("WhiteRook"), Texture::from_path(
+            Path::new("bin/assets/white/white_rook.png"),
+            &TextureSettings::new(),
+        ).unwrap());
+
+        map.insert(String::from("WhiteBishop"), Texture::from_path(
+            Path::new("bin/assets/white/white_bishop.png"),
+            &TextureSettings::new(),
+        ).unwrap());
+
+        map.insert(String::from("WhitePawn"), Texture::from_path(
+            Path::new("bin/assets/white/white_pawn.png"),
+            &TextureSettings::new(),
+        ).unwrap());
+
+        map.insert(String::from("WhiteKnight"), Texture::from_path(
+            Path::new("bin/assets/white/white_knight.png"),
+            &TextureSettings::new(),
+        ).unwrap());
+
+        map.insert(String::from("WhiteQueen"), Texture::from_path(
+            Path::new("bin/assets/white/white_queen.png"),
             &TextureSettings::new(),
         ).unwrap());
 
@@ -337,19 +369,35 @@ impl Piece {
                 let unwrapped_tile = current_tile.clone().unwrap();
                 let name = unwrapped_piece.name;
 
-                if name == "Pawn" && !unwrapped_piece.white {
-                    let first_tile_down_i = unwrapped_tile.board_index + 16;
-                    let to_render = board.get_tile_based_on_index(first_tile_down_i);
+                if name == "Pawn" {
+                    if !unwrapped_piece.white {
+                        let first_tile_down_i = unwrapped_tile.board_index + 16;
+                        let to_render = board.get_tile_based_on_index(first_tile_down_i);
 
-                    if to_render.is_some() {
-                        moves.push(to_render.unwrap());
-                    }
+                        if to_render.is_some() {
+                            moves.push(to_render.unwrap());
+                        }
 
-                    let second_tile_down_i = unwrapped_tile.board_index + 8;
-                    let second_tile = board.get_tile_based_on_index(second_tile_down_i);
+                        let second_tile_down_i = unwrapped_tile.board_index + 8;
+                        let second_tile = board.get_tile_based_on_index(second_tile_down_i);
 
-                    if second_tile.is_some() {
-                        moves.push(second_tile.unwrap());
+                        if second_tile.is_some() {
+                            moves.push(second_tile.unwrap());
+                        }
+                    } else {
+                        let first_tile_down_i = unwrapped_tile.board_index - 16;
+                        let to_render = board.get_tile_based_on_index(first_tile_down_i);
+
+                        if to_render.is_some() {
+                            moves.push(to_render.unwrap());
+                        }
+
+                        let second_tile_down_i = unwrapped_tile.board_index - 8;
+                        let second_tile = board.get_tile_based_on_index(second_tile_down_i);
+
+                        if second_tile.is_some() {
+                            moves.push(second_tile.unwrap());
+                        }
                     }
                 }
             }
