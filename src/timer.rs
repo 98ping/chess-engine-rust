@@ -3,9 +3,18 @@ use graphics::rectangle::rectangle_by_corners;
 use opengl_graphics::{GlGraphics, GlyphCache};
 use piston::input::RenderArgs;
 
-pub struct Timer {}
+pub struct Timer {
+    pub white_turn: bool,
+    pub started: bool,
+    pub white_time: i32,
+    pub black_time: i32
+}
 
 impl Timer {
+    pub fn schedule(&mut self) {
+        
+    }
+
     pub fn draw_timers(&self, gl: &mut GlGraphics, r: &RenderArgs, glyphs: &mut GlyphCache) {
         gl.draw(r.viewport(), |c, g| {
             let black_transform_text = c.transform.trans(860.0, 137.0);

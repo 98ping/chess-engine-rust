@@ -14,8 +14,8 @@ use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow;
-use graphics::{DrawState, Ellipse, Image, Text, text, Transformed};
-use graphics::types::{Color, Rectangle};
+use graphics::{DrawState, Ellipse, Image, Transformed};
+use graphics::types::Color;
 use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, Texture, TextureSettings};
 use fen::Fen;
 use std::path::Path;
@@ -56,7 +56,14 @@ fn main() {
     let mut glyphs = GlyphCache::new("bin/views/FiraSans-Regular.ttf", (), TextureSettings::new())
         .expect("Could not load font");
 
-    let timer_handler = Timer { };
+    let mut timer_handler = Timer {
+        white_turn: false,
+        started: false,
+        white_time: 180,
+        black_time: 180
+    };
+
+    timer_handler.schedule();
 
     while let Some(e) = events.next(&mut window) {
         use graphics::*;
