@@ -5,7 +5,8 @@ use Board;
 
 pub struct MoveHandler {
     pub selected_cell: Option<Tile>,
-    pub cursor_pos: [f64; 2]
+    pub cursor_pos: [f64; 2],
+    pub move_circle_tiles: Vec<Tile>
 }
 
 // For future refrence:
@@ -132,7 +133,8 @@ impl MoveHandler {
     pub fn new() -> MoveHandler {
         MoveHandler {
             selected_cell: None,
-            cursor_pos: [0.0; 2]
+            cursor_pos: [0.0; 2],
+            move_circle_tiles: vec![]
         }
     }
 
@@ -177,6 +179,7 @@ impl MoveHandler {
 
                                 for tile_move in moves.iter() {
                                     tile_move.render_move_circle(&mut board.gl, render_args);
+                                    self.move_circle_tiles.push(tile_move.clone());
                                 }
                             }
                         }
@@ -192,6 +195,7 @@ impl MoveHandler {
 
                             if prev_tile.is_none() {
                                 self.selected_cell = None;
+                                self.move_circle_tiles.clear();
                                 return
                             }
 
@@ -200,6 +204,7 @@ impl MoveHandler {
 
                             if prev_piece.is_none() {
                                 self.selected_cell = None;
+                                self.move_circle_tiles.clear();
                                 return
                             }
 
@@ -209,12 +214,14 @@ impl MoveHandler {
                             if this_piece.is_some() && (this_piece.unwrap().white == to_move.white) {
                                 println!("This square is already occupied by a piece!");
                                 self.selected_cell = None;
+                                self.move_circle_tiles.clear();
                                 return;
                             }
 
                             if !to_move.get_move_tiles(&board, unwrapped_prev_tile.board_index).contains(tile) {
                                 println!("Could not move here because moves did not contain this tile");
                                 self.selected_cell = None;
+                                self.move_circle_tiles.clear();
                                 return
                             }
 
@@ -243,6 +250,7 @@ impl MoveHandler {
                     }
                 }
                 self.selected_cell = None;
+                self.move_circle_tiles.clear();
             }
         }
     }

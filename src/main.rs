@@ -50,7 +50,7 @@ fn main() {
     };
 
     let mut events = Events::new(EventSettings::new())
-        .ups(2);
+        .ups(30);
 
     let mut started: i32 = 0;
     let mut glyphs = GlyphCache::new("bin/views/FiraSans-Regular.ttf", (), TextureSettings::new())
@@ -111,7 +111,14 @@ fn main() {
 
                 started = 1;
             } else {
-                board.update(&r)
+                board.update(&r);
+
+                for update in move_handler.move_circle_tiles.clone() {
+                    update.render_move_circle(
+                        &mut board.gl,
+                        &r
+                    );
+                }
             }
         }
     }
@@ -197,7 +204,6 @@ impl Tile {
         let x: u32 = self.x1;
         let y: u32 = self.y1;
 
-        println!("Rendering move circle");
         gl.draw(
             args.viewport(),
             |c, gl| {
@@ -210,7 +216,6 @@ impl Tile {
                     );
             },
         );
-        println!("Rendering at: {}, {}", x, y);
     }
 
     fn map_textures_to_pieces(&self) -> HashMap<String, Texture> {
@@ -376,35 +381,79 @@ impl Piece {
                 let unwrapped_tile = current_tile.clone().unwrap();
                 let name = unwrapped_piece.name;
 
+                // Pawn Logic
                 if name == "Pawn" {
                     if !unwrapped_piece.white {
+                        // First tile for pawn
                         let first_tile_down_i = unwrapped_tile.board_index + 16;
                         let to_render = board.get_tile_based_on_index(first_tile_down_i);
 
                         if to_render.is_some() {
-                            moves.push(to_render.unwrap());
+                            // Only start adding stuff if the owning piece is none.
+                            if to_render.clone().unwrap().owning_piece.is_none() {
+                                moves.push(to_render.unwrap());
+                            }
                         }
 
+                        // Second tile if it is the first move
                         let second_tile_down_i = unwrapped_tile.board_index + 8;
                         let second_tile = board.get_tile_based_on_index(second_tile_down_i);
 
                         if second_tile.is_some() {
-                            moves.push(second_tile.unwrap());
+                            // Only start adding stuff if the owning piece is none.
+                            if second_tile.clone().unwrap().owning_piece.is_none() {
+                                moves.push(second_tile.unwrap());
+                            }
                         }
                     } else {
+                        // First tile for pawn
                         let first_tile_down_i = unwrapped_tile.board_index - 16;
                         let to_render = board.get_tile_based_on_index(first_tile_down_i);
 
                         if to_render.is_some() {
-                            moves.push(to_render.unwrap());
+                            // Only start adding stuff if the owning piece is none.
+                            if to_render.clone().unwrap().owning_piece.is_none() {
+                                moves.push(to_render.unwrap());
+                            }
                         }
 
+                        // Second tile if it is the first move
                         let second_tile_down_i = unwrapped_tile.board_index - 8;
                         let second_tile = board.get_tile_based_on_index(second_tile_down_i);
 
                         if second_tile.is_some() {
-                            moves.push(second_tile.unwrap());
+                            // Only start adding stuff if the owning piece is none.
+                            if second_tile.clone().unwrap().owning_piece.is_none() {
+                                moves.push(second_tile.unwrap());
+                            }
                         }
+                    }
+                }
+
+                // Bishop Logic
+                if name == "Bishop" {
+                    if !unwrapped_piece.white {
+                        for i in 1..9 {
+                            let position = (8 * i) + (1 * i);
+                            let diagonal = unwrapped_tile.board_index + position;
+                            let max_distance_allowed = 8 - (unwrapped_tile.x1 / 100);
+
+                            if i >= max_distance_allowed {
+                                continue;
+                            }
+
+                            if diagonal > 63 {
+                                continue;
+                            }
+
+                            let optional_diag_tile = board.get_tile_based_on_index(diagonal);
+
+                            if optional_diag_tile.is_some() {
+                                moves.push(optional_diag_tile.unwrap());
+                            }
+                        }
+                    } else {
+
                     }
                 }
             }
