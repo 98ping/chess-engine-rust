@@ -10,6 +10,7 @@ extern crate piston;
 extern crate rand;
 
 use std::collections::HashMap;
+use std::num::Wrapping;
 use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
@@ -433,23 +434,38 @@ impl Piece {
                 // Bishop Logic
                 if name == "Bishop" {
                     if !unwrapped_piece.white {
-                        for i in 1..9 {
-                            let position = (8 * i) + (1 * i);
-                            let diagonal = unwrapped_tile.board_index + position;
+                        for i in 0..9 {
+                            let position = Wrapping((8 * i) + (1 * i));
+                            let position_backwards = Wrapping((8 * i) + (1 * i));
+
+                            let diagonal = Wrapping(unwrapped_tile.board_index) + position;
+                            let backwards_diagonal = Wrapping(unwrapped_tile.board_index) - position_backwards;
                             let max_distance_allowed = 8 - (unwrapped_tile.x1 / 100);
 
-                            if i >= max_distance_allowed {
+                            if i > max_distance_allowed {
                                 continue;
                             }
 
-                            if diagonal > 63 {
+
+                            if diagonal.0 > 63 {
                                 continue;
                             }
 
-                            let optional_diag_tile = board.get_tile_based_on_index(diagonal);
+
+                            let optional_diag_tile = board.get_tile_based_on_index(diagonal.0);
 
                             if optional_diag_tile.is_some() {
                                 moves.push(optional_diag_tile.unwrap());
+                            }
+
+                            if backwards_diagonal.0 > 63 {
+                                continue;
+                            }
+
+                            let optional_backwards_diag_tile = board.get_tile_based_on_index(backwards_diagonal.0);
+
+                            if optional_backwards_diag_tile.is_some() {
+                                moves.push(optional_backwards_diag_tile.unwrap())
                             }
                         }
                     } else {
