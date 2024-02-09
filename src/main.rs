@@ -20,6 +20,7 @@ use graphics::types::Color;
 use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, Texture, TextureSettings};
 use fen::Fen;
 use std::path::Path;
+use std::time::Instant;
 use r#move::MoveHandler;
 use timer::Timer;
 
@@ -61,10 +62,9 @@ fn main() {
         white_turn: false,
         started: false,
         white_time: 180,
-        black_time: 180
+        black_time: 180,
+        last_tick: Instant::now()
     };
-
-    timer_handler.schedule();
 
     while let Some(e) = events.next(&mut window) {
         use graphics::*;
