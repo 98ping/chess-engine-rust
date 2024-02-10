@@ -1,6 +1,7 @@
 mod r#move;
 mod fen;
 mod timer;
+mod modules;
 
 extern crate glutin_window;
 extern crate graphics;
@@ -16,11 +17,11 @@ use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow;
 use graphics::{DrawState, Ellipse, Image, Transformed};
-use graphics::types::Color;
 use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, Texture, TextureSettings};
 use fen::Fen;
 use std::path::Path;
 use std::time::Instant;
+use modules::*;
 use r#move::MoveHandler;
 use timer::Timer;
 
@@ -66,8 +67,23 @@ fn main() {
         last_tick: Instant::now()
     };
 
+    let mut chess_buttons: Vec<ChessButton> = vec![];
+
     while let Some(e) = events.next(&mut window) {
         use graphics::*;
+
+        // Start the timer if the game has started
+        if timer_handler.started {
+            if Instant::now().duration_since(timer_handler.last_tick).as_secs() >= 1 {
+                timer_handler.last_tick = Instant::now();
+
+                if timer_handler.white_turn {
+                    timer_handler.white_time -= 1;
+                } else {
+                    timer_handler.black_time -= 1;
+                }
+            }
+        }
 
         move_handler.event(
             800.0,
@@ -123,34 +139,6 @@ fn main() {
             }
         }
     }
-}
-
-#[derive(Clone)]
-#[derive(PartialEq)]
-pub struct Piece {
-    worth: i32,
-    name: String,
-    capturable: bool,
-    white: bool
-}
-
-pub struct Board {
-    gl: GlGraphics,
-    tiles_per_axis: u32,
-    tile_len: f64,
-    tiles: HashMap<u32, Tile>,
-}
-
-#[derive(Clone)]
-#[derive(PartialEq)]
-pub struct Tile {
-    color: Color,
-    x1: u32,
-    y1: u32,
-    x2: u32,
-    y2: u32,
-    owning_piece: Option<Piece>,
-    board_index: u32,
 }
 
 impl Tile {
@@ -476,5 +464,17 @@ impl Piece {
         }
 
         return moves;
+    }
+}
+
+impl ChessButton {
+    pub fn is_inside(&self, cx: u64, cy: u64) -> bool {
+        let x1 = self.x1;
+        let y1 = self.y1;
+
+        let x2 = self.x2;
+        let y2 = self.y2;
+
+        return (cx > x1 && cx < x2) && (cy > y1 && cy < y2);
     }
 }
