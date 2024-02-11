@@ -4,6 +4,7 @@ use opengl_graphics::GlGraphics;
 
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Debug)]
 pub struct Piece {
     pub worth: i32,
     pub name: String,
@@ -20,6 +21,7 @@ pub struct Board {
 
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Debug)]
 pub struct Tile {
     pub color: Color,
     pub x1: u32,

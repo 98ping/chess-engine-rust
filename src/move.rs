@@ -1,3 +1,5 @@
+use std::num::Wrapping;
+
 use opengl_graphics::GlGraphics;
 use piston::input::{GenericEvent, RenderArgs};
 use ::{Tile};

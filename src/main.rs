@@ -304,6 +304,34 @@ impl Board {
         }
     }
 
+    fn get_horizontal_moves(&self, current_index: u32) -> Vec<Tile> {
+        let mut moves: Vec<Tile> = vec![];
+
+        for i in 0..9 {
+            let addition = Wrapping(8 * i);
+
+            let position_upwards = Wrapping(current_index) + addition;
+            let position_downwards = Wrapping(current_index) - addition;
+
+            let optional_horizontal_tile_downwards = self.get_tile_based_on_index(position_downwards.0);
+            
+
+            if optional_horizontal_tile_downwards.is_some() {
+                moves.push(optional_horizontal_tile_downwards.unwrap());
+            }
+
+            let optional_horizontal_tile_upwards = self.get_tile_based_on_index(position_upwards.0);
+
+            if optional_horizontal_tile_upwards.is_some() {
+                moves.push(optional_horizontal_tile_upwards.unwrap());
+            }
+        }
+
+        println!("{:?}", moves);
+
+        return moves;
+    }
+
     fn get_tile_based_on_piece(&self, piece: &Piece) -> Option<&Tile> {
         for tile in self.tiles.values() {
             if tile.owning_piece.is_some() && tile.owning_piece.clone().unwrap() == *piece {
@@ -458,6 +486,15 @@ impl Piece {
                         }
                     } else {
 
+                    }
+                }
+
+                // Logic for Rooks
+                if name == "Rook" {
+                    let horizontal_moves = board.get_horizontal_moves(current_tile_index);
+
+                    for tile in horizontal_moves {
+                        moves.push(tile);
                     }
                 }
             }
