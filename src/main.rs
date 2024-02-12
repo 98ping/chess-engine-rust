@@ -13,6 +13,7 @@ extern crate rand;
 use std::collections::HashMap;
 use std::num::Wrapping;
 use std::ops::Mul;
+use graphics::circle_arc;
 use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
@@ -307,9 +308,39 @@ impl Board {
     
     fn get_horizontal_moves(&self, current_index: u32) -> Vec<Tile> {
         let mut moves: Vec<Tile> = vec![];
+        let row = self.get_current_row_from_index(current_index).unwrap();
+
+        let row_amount = Wrapping(8);
+        let maximum_index = row_amount * Wrapping(row);
+        
+        let corrected_minimum_index = Wrapping(row) - Wrapping(1);
+        let minimum_index = row_amount * corrected_minimum_index;
 
         for i in 0..9 {
+            let addition = Wrapping(i);
 
+            let position_left = Wrapping(current_index) - addition;
+            let position_right = Wrapping(current_index) + addition;
+
+            let optional_vertical_tile_left = self.get_tile_based_on_index(position_left.0);
+            
+            if optional_vertical_tile_left.is_some() {
+                if position_left.0 < minimum_index.0 {
+                    continue;
+                }
+
+                moves.push(optional_vertical_tile_left.unwrap());
+            }
+
+            let optional_vertical_tile_right = self.get_tile_based_on_index(position_right.0);
+
+            if optional_vertical_tile_right.is_some() {
+                if position_right.0 > maximum_index.0 {
+                    continue;
+                }
+
+                moves.push(optional_vertical_tile_right.unwrap());
+            }
         }
 
         return moves;
@@ -339,6 +370,10 @@ impl Board {
         }
 
         return moves;
+    }
+
+    pub fn get_current_row_from_index(&self, position: u32) -> Option<u32> {
+        return Some((position).div_ceil(8));
     }
 
     fn get_tile_based_on_piece(&self, piece: &Piece) -> Option<&Tile> {
