@@ -309,36 +309,7 @@ impl Board {
         let mut moves: Vec<Tile> = vec![];
 
         for i in 0..9 {
-            // Max row position to the left
-            let max_row_position = Wrapping(8) * Wrapping(i);
 
-            // Max row position to the right
-            let min_index: Wrapping<u32> = max_row_position - Wrapping(1);
-            let min_row_position = Wrapping(min_index.0);
-
-            let position_right = Wrapping(current_index) + Wrapping(i);
-            let position_left = Wrapping(current_index) - Wrapping(i);
-
-            let optional_horizontal_tile_downwards = self.get_tile_based_on_index(position_left.0);
-            
-
-            if optional_horizontal_tile_downwards.is_some() {
-                if position_left.0 < min_row_position.0 {
-                    continue;
-                }
-
-                moves.push(optional_horizontal_tile_downwards.unwrap());
-            }
-
-            let optional_horizontal_tile_upwards = self.get_tile_based_on_index(position_right.0);
-
-            if optional_horizontal_tile_upwards.is_some() {
-                if position_right.0 > max_row_position.0 {
-                    continue;
-                }
-
-                moves.push(optional_horizontal_tile_upwards.unwrap());
-            }
         }
 
         return moves;
