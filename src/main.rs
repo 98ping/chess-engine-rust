@@ -12,6 +12,7 @@ extern crate rand;
 
 use std::collections::HashMap;
 use std::num::Wrapping;
+use std::ops::Mul;
 use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
@@ -303,8 +304,47 @@ impl Board {
             tile.render(&mut self.gl, args);
         }
     }
-
+    
     fn get_horizontal_moves(&self, current_index: u32) -> Vec<Tile> {
+        let mut moves: Vec<Tile> = vec![];
+
+        for i in 0..9 {
+            // Max row position to the left
+            let max_row_position = Wrapping(8) * Wrapping(i);
+
+            // Max row position to the right
+            let min_index: Wrapping<u32> = max_row_position - Wrapping(1);
+            let min_row_position = Wrapping(min_index.0);
+
+            let position_right = Wrapping(current_index) + Wrapping(i);
+            let position_left = Wrapping(current_index) - Wrapping(i);
+
+            let optional_horizontal_tile_downwards = self.get_tile_based_on_index(position_left.0);
+            
+
+            if optional_horizontal_tile_downwards.is_some() {
+                if position_left.0 < min_row_position.0 {
+                    continue;
+                }
+
+                moves.push(optional_horizontal_tile_downwards.unwrap());
+            }
+
+            let optional_horizontal_tile_upwards = self.get_tile_based_on_index(position_right.0);
+
+            if optional_horizontal_tile_upwards.is_some() {
+                if position_right.0 > max_row_position.0 {
+                    continue;
+                }
+
+                moves.push(optional_horizontal_tile_upwards.unwrap());
+            }
+        }
+
+        return moves;
+    }
+
+    fn get_vertical_moves(&self, current_index: u32) -> Vec<Tile> {
         let mut moves: Vec<Tile> = vec![];
 
         for i in 0..9 {
@@ -313,21 +353,19 @@ impl Board {
             let position_upwards = Wrapping(current_index) + addition;
             let position_downwards = Wrapping(current_index) - addition;
 
-            let optional_horizontal_tile_downwards = self.get_tile_based_on_index(position_downwards.0);
+            let optional_vertical_tile_downwards = self.get_tile_based_on_index(position_downwards.0);
             
 
-            if optional_horizontal_tile_downwards.is_some() {
-                moves.push(optional_horizontal_tile_downwards.unwrap());
+            if optional_vertical_tile_downwards.is_some() {
+                moves.push(optional_vertical_tile_downwards.unwrap());
             }
 
-            let optional_horizontal_tile_upwards = self.get_tile_based_on_index(position_upwards.0);
+            let optional_vertical_tile_upwards = self.get_tile_based_on_index(position_upwards.0);
 
-            if optional_horizontal_tile_upwards.is_some() {
-                moves.push(optional_horizontal_tile_upwards.unwrap());
+            if optional_vertical_tile_upwards.is_some() {
+                moves.push(optional_vertical_tile_upwards.unwrap());
             }
         }
-
-        println!("{:?}", moves);
 
         return moves;
     }
@@ -491,6 +529,12 @@ impl Piece {
 
                 // Logic for Rooks
                 if name == "Rook" {
+                    let vertical_moves = board.get_vertical_moves(current_tile_index);
+
+                    for tile in vertical_moves {
+                        moves.push(tile);
+                    }
+
                     let horizontal_moves = board.get_horizontal_moves(current_tile_index);
 
                     for tile in horizontal_moves {
